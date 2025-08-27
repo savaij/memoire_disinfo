@@ -1,6 +1,6 @@
 # Evons – Disinformation detection & Virality prediction
 
-This repository contains exploratory notebook experiments on the Evons news dataset, centered on two supervised tasks:
+This repository contains notebook experiments on the Evons news dataset, centered on two supervised tasks:
 
 1. Disinformation Detection: Classify news items as fake vs real.
 2. Virality Prediction: Predict whether an item will become highly engaged (viral) based on a threshold over Facebook engagement statistics.

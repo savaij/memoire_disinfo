@@ -5,8 +5,6 @@ This repository contains notebook experiments on the Evons news dataset, centere
 1. Disinformation Detection: Classify news items as fake vs real.
 2. Virality Prediction: Predict whether an item will become highly engaged (viral) based on a threshold over Facebook engagement statistics.
 
-All experiments use lightweight feed‑forward (MLP) classifiers over frozen (precomputed) text embeddings (e.g., RoBERTa CLS vectors or alternative large-model embeddings). Variants differ only in what auxiliary source/context signal they add (none, per‑source statistics, gating fusion, or learned source embeddings).
-
 ## Repository Structure
 
 ```
@@ -28,3 +26,11 @@ All experiments use lightweight feed‑forward (MLP) classifiers over frozen (pr
 ```
 
 Instructions on how to download data are showed in the [data](./data) readme.
+
+## Data Representation
+Each item in Evons dataset is formed by a title and a caption. Information on the source are also included.
+
+
+## Model families
+
+All experiments use lightweight feed‑forward (MLP) classifiers over frozen (precomputed) text embeddings (e.g., RoBERTa CLS vectors or alternative large-model embeddings). Variants differ only in what auxiliary source/context signal they add (none, per‑source statistics, gating fusion, or learned source embeddings).

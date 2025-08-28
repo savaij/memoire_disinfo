@@ -48,7 +48,7 @@ See each dataset’s `data/readme.md` for authoritative links and any required c
 ## 5. How To Reproduce
 
 1. Obtain & place data as per `evons/data/readme.md` and `FakeNewsNet/data/readme.md`.
-2. (Optional) For FakeNewsNet: regenerate using scripts in `FakeNewsNet/data_preprocessing/` (`path_creation.py`, `ordering_data.py`, `create_embeddings.py`, `create_embeddings_mistral.py`). <br> Evons notebook already provide code for embedding texts on-the-fly if not available in `evons/data` folder.
+2. (Optional) For FakeNewsNet: regenerate using scripts in `FakeNewsNet/data_preprocessing/` (`path_creation.py`, `ordering_data.py`, `create_embeddings.py`, `create_embeddings_mistral.py`). <br> Evons notebook already provide code for embedding texts on-the-fly if not available in `evons/data` folder. If you download already processed data, you can skip this step.
 3. Open the relevant notebook (e.g., `evons/disinformation_detection/MLP.ipynb`) and execute cells top‑to‑bottom. Notebooks are self‑contained (data paths assume relative placement inside each dataset’s `data/`).
 4. Compare output metrics across variants.
 

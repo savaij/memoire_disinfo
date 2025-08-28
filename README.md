@@ -74,4 +74,8 @@ The following packages are required:
 
 
 ---
+**Important**: the code does not save model weights after training. To save them, modify the notebooks, specifically the 
+_`train_single_fold`_ functions.
+
+---
 For questions or access issues (e.g., processed data links), contact the author.

@@ -62,11 +62,7 @@ The following packages are required:
 
 `mistralai` required for Mistral embedding generation.
 
-## 6. Design Rationale (Dataset‑Specific Modeling)
-* Evons articles lack temporal structure → simple MLP suffices; experimentation focuses on integrating minimal, interpretable source/engagement signals.
-* FakeNewsNet propagations capture temporal diffusion dynamics → sequence models (CNN for local n‑gram‑like temporal patterns, RNN/GRU/LSTM for recurrent dependencies, Transformer for global self‑attention) allow exploring how representation choice influences prediction under short sequences.
-
-## 7. Folder Quick Reference
+## 6. Folder Quick Reference
 
 | Path | Purpose |
 |------|---------|

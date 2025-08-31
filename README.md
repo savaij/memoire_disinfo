@@ -2,6 +2,8 @@
 
 This repository contains the codebase for the master thesis (M2 « Humanités Numériques », École nationale des chartes) studying automatic classification of (a) fake vs. real news and (b) viral vs. non‑viral items / propagations across two different news datasets. 
 
+[**Click here to read the thesis!**](https://nbviewer.org/github/savaij/memoire_disinfo/blob/main/report/memoire.pdf)
+
 ## 1. Tasks
 
 | Task | Definition | Label Source |

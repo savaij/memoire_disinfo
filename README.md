@@ -26,11 +26,13 @@ memoire_disinfo/
 │   ├── disinformation_detection/    # MLP variants (RoBERTa & Mistral)
 │   └── virality_prediction/         # MLP baseline + source / engagement feature variants
 │
-└── FakeNewsNet/
-    ├── data/                        # Politifact sequences & embeddings (external download)
-    ├── data_preprocessing/          # Scripts: ordering, path creation, embedding generation
-    ├── disinformation_detection/    # Sequence model notebooks (CNN/RNN/GRU/LSTM/Transformer)
-    └── virality_prediction/         # Same architectures for virality label
+├── FakeNewsNet/
+│   ├── data/                        # Politifact sequences & embeddings (external download)
+│   ├── data_preprocessing/          # Scripts: ordering, path creation, embedding generation
+│   ├── disinformation_detection/    # Sequence model notebooks (CNN/RNN/GRU/LSTM/Transformer)
+│   └── virality_prediction/         # Same architectures for virality label
+│
+└── report/                          # LaTeX sources and compiled PDF of the report
 ```
 
 Both dataset folders intentionally mirror a two‑task layout for clarity and comparability.

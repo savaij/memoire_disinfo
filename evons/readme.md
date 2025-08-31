@@ -9,19 +9,22 @@ This repository contains notebook experiments on the Evons news dataset, centere
 
 ```
 .
-├── data/                                # folder for raw data and precomputed embeddings
+├── data/                                 # raw data and (once created) saved embeddings (.pt)
 │
-├── disinformation_detection/            # notebooks for training models on virality prediction
-│   ├── MLP.ipynb                        # MLP + classic ML baselines
-│   ├── MLP_mistral.ipynb                # Same architecture on Mistral embeddings
+├── data_preprocessing/                   # script to build derived datasets with mistral
+│   └── create_embeddings_evons.py        # generates Mistral embeddings for title & description (BERT embeddings can be created on-the-fly in notebooks)
+│
+├── disinformation_detection/             # notebooks for training models on disinformation detection
+│   ├── MLP.ipynb                         # MLP + classic ML baselines
+│   ├── MLP_mistral.ipynb                 # Same architecture on Mistral embeddings
 │   └── readme.md
 │
-└── virality_prediction/                 # notebooks for training models on virality prediction
-    ├── MLP.ipynb                        # MLP + classic ML baselines
-    ├── source_embedding_model.ipynb     # Adds learned media-source embedding
-    ├── average_engagement_model.ipynb   # Adds numeric per-source average engagement feature
-    ├── gating_model.ipynb               # Gated fusion of engagement + text features
-    ├── gating_model_mistral.ipynb       # Gated fusion variant on Mistral embeddings
+└── virality_prediction/                  # notebooks for training models on virality prediction
+    ├── MLP.ipynb                         # MLP + classic ML baselines
+    ├── source_embedding_model.ipynb      # Adds learned media-source embedding
+    ├── average_engagement_model.ipynb    # Adds numeric per-source average engagement feature
+    ├── gating_model.ipynb                # Gated fusion of engagement + text features
+    ├── gating_model_mistral.ipynb        # Gated fusion variant on Mistral embeddings
     └── readme.md
 ```
 

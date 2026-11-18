@@ -12,3 +12,4 @@ evons/data/*.pt
 evons/data/*_manifest.json
 evons/data/embeddings/
 results/RUN_FAILED.txt
+AGENTS.md

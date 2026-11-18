@@ -1,6 +1,6 @@
-# What Do Misinformation Benchmarks Measure?
+# From veracity to diffusion
 
-This repository contains the code and saved results for the paper “What Do Misinformation Benchmarks Measure? Construct Validity in Veracity and Engagement Prediction.”
+This repository contains the code and saved results for the paper “From veracity to diffusion: Operationalizing misinformation prediction beyond fake-news detection”
 
 The study uses EVONS and the PolitiFact part of FakeNewsNet as datasets. It examines whether models can predict the fake or real labels recorded in each dataset, and whether they can identify items with many social media interactions, such as likes, comments, shares, or tweet favorites. For FakeNewsNet, it also compares predictions based on the first few tweets with predictions based on all recovered tweets. A separate analysis checks whether favorites on early tweets are related to favorites on later tweets.
 

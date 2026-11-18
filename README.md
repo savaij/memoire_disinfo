@@ -51,16 +51,21 @@ See each dataset’s `data/readme.md` for authoritative links and any required c
 
 ## 5. How To Reproduce
 
-1. Obtain & place data as per `evons/data/readme.md` and `FakeNewsNet/data/readme.md`.
-2. (Optional) For FakeNewsNet: regenerate using scripts in `FakeNewsNet/data_preprocessing/` (`path_creation.py`, `ordering_data.py`, `create_embeddings.py`, `create_embeddings_mistral.py`). <br> Evons notebook already provide code for embedding texts on-the-fly if not available in `evons/data` folder. If you download already processed data, you can skip this step.
+1. Obtain and place data as described in `evons/data/readme.md` and `FakeNewsNet/data/readme.md`.
+2. (Optional) For FakeNewsNet: regenerate data using scripts in `FakeNewsNet/data_preprocessing/` (`path_creation.py`, `ordering_data.py`, `create_embeddings.py`, `create_embeddings_mistral.py`). <br> Evons notebooks already provide code for embedding texts on the fly if they are not available in the `evons/data` folder. If you download preprocessed data, you can skip this step.
 3. Open the relevant notebook (e.g., `evons/disinformation_detection/MLP.ipynb`) and execute cells top‑to‑bottom. Notebooks are self‑contained (data paths assume relative placement inside each dataset’s `data/`).
 4. Compare output metrics across variants.
 
 ### Suggested Python Environment 
 The following packages are required:
-`torch`, `transformers`, `scikit-learn`, `pandas`, `numpy`, `tqdm`, `matplotlib`, `seaborn`, `wandb`. 
+`torch`, `transformers`, `scikit-learn`, `pandas`, `numpy`, `tqdm`, `matplotlib`, `seaborn`, `wandb`, `jupyter`, `notebook`.
 
-`mistralai` required for Mistral embedding generation.
+`mistralai` is required for Mistral embedding generation.
+
+You can install everything with:
+```bash
+pip install -r requirements.txt
+```
 
 ## 6. Folder Quick Reference
 
@@ -79,3 +84,87 @@ _`train_single_fold`_ functions.
 
 ---
 For questions or access issues (e.g., processed data links), contact the author.
+
+
+## 7. Statistical significance add-on (for rebuttal / paper revision)
+
+To support model-comparison claims with inferential statistics (instead of only mean/std across folds), use:
+
+```bash
+python tools/statistical_evaluation.py --input <metrics.csv> --output <stats.csv>
+```
+
+The script expects per-fold metrics and outputs, for each pair of models (within each dataset/task/metric):
+- paired mean difference
+- bootstrap 95% CI of the mean difference
+- exact sign-flip p-value (paired test; Monte-Carlo approximation for many folds)
+- Holm-Bonferroni corrected p-values
+- Cliff's delta effect size
+
+Supported input formats:
+- **long**: `dataset,task,metric,fold,model,value`
+- **wide** (one column per model) with `--wide --id-cols dataset task metric fold`
+
+This is compatible with already-computed embeddings and preprocessed data; no embedding recomputation is required.
+
+
+## 8. EVONS source-confounding audit (no embedding recomputation)
+
+To directly test source leakage risk (review concern), run:
+
+```bash
+python tools/evons_source_confounding_audit.py \
+  --input evons/data/evons.csv \
+  --metrics-out report/evons_source_audit_folds.csv \
+  --report-out report/evons_source_audit_report.json \
+  --export-group-folds report/evons_group_folds.csv
+```
+
+This script computes:
+- source-label association diagnostics (Chi² and Cramér's V)
+- a **source-only baseline** under random K-fold vs group K-fold by source
+- per-fold metrics (`accuracy`, `macro_f1`, `unseen_source_ratio`)
+- optional row-to-fold assignment for source-grouped CV reuse in notebooks
+
+Interpretation: if source-only performance is strong on random CV but drops on source-grouped CV, the task is likely source-confounded.
+
+
+## 9. FakeNewsNet virality sensitivity audit (no embedding recomputation)
+
+To justify the virality definition and evaluate an early-detection framing with existing preprocessed propagations:
+
+```bash
+python tools/fakenewsnet_virality_sensitivity.py \
+  --input-jsonl FakeNewsNet/data/ordered_real_propagation_paths.jsonl \
+  --thresholds-out report/fnn_virality_thresholds_real.csv \
+  --early-out report/fnn_virality_early_real.csv \
+  --summary-out report/fnn_virality_summary_real.json
+```
+
+Run it on both real and fake propagation files, then merge rows for a global view if needed.
+
+What it reports:
+- threshold sensitivity for q50/q75/q90/q95 (or custom quantiles): threshold value and class balance
+- early-signal diagnostics using first `k` tweets (configurable):
+  - correlation between prefix likes and final total likes
+  - AUC of prefix-likes as a simple score for each threshold-defined label
+  - average prefix/total engagement ratio
+
+This enables reframing q50 as high/low engagement and testing stricter virality (q90/q95) without retraining embeddings.
+
+
+## 10. Colab quick-start (without embedding recomputation)
+
+If you already have precomputed embeddings and only want to rerun training/evaluation in Colab, use:
+
+- `colab_no_embeddings/evons_colab_runbook.md`
+- `colab_no_embeddings/fakenewsnet_colab_runbook.md`
+
+These runbooks now point to a **single consolidated notebook per task** (4 notebooks total: Evons/FakeNewsNet × disinformation/virality), and explicitly skip embedding regeneration scripts.
+
+
+## Backend GPU opzionale per le baseline
+
+RF e regressione logistica supportano `--baseline-backend cpu|gpu` nel runner di revisione.
+Per ambiente conda, kernel notebook, benchmark separato e compatibilità dei CSV, vedere
+[la guida del backend](tools/README_baseline_backend.md).

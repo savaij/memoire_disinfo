@@ -1,0 +1,106 @@
+% LREC 2026 paper draft aligned with current repository outputs
+\documentclass[10pt, a4paper]{article}
+
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{multirow}
+\usepackage{makecell}
+\usepackage{graphicx}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{amsmath,amssymb}
+\usepackage[review]{lrec2026}
+
+\title{What Signals Really Matter for Misinformation Tasks? \\
+Evaluation-First Benchmarks for Fake-News Detection and Virality Prediction}
+
+\name{Francesco Paolo Savatteri, Chahan Vidal-Gor\`ene, Florian Cafiero}
+
+\address{Ecole nationale des chartes - PSL\\
+65 rue de Richelieu, 72002, Paris, France \\
+francesco.savatteri@chartes.psl.edu, chahan.vidalgorene@chartes.psl.eu, florian.cafiero@chartes.psl.eu}
+
+\abstract{
+We present an evaluation-first study of two operational misinformation tasks: (i) fake-news detection and (ii) virality prediction. Using EVONS and FakeNewsNet (Politifact), we compare frozen text-embedding pipelines (RoBERTa and Mistral) with lightweight downstream classifiers (MLP, logistic regression, random forest, and XGBoost when available). We report consolidated 10-split results from the repository artifacts and complement descriptive metrics with paired inferential tests (bootstrap confidence intervals, sign-flip permutation tests, Holm--Bonferroni correction, Cliff's $\delta$). The results show a robust task-difficulty gap: fake-news detection is near ceiling on EVONS and strong on FakeNewsNet, whereas virality prediction is more sensitive to label construction and class imbalance. On EVONS virality (95th-percentile label), only \texttt{gating\_mistral} attains substantial F1 among tested variants. On FakeNewsNet virality (median split), several models are close, with \texttt{xgboost\_bert} leading by mean F1 but without corrected significance over the strongest alternatives. These findings support transparent, statistically controlled reporting before architecture-centric claims.
+\\ \newline \Keywords{Misinformation detection, Virality prediction, Evaluation protocol, Statistical significance, EVONS, FakeNewsNet, Reproducibility}
+}
+
+\begin{document}
+\maketitleabstract
+
+\section{Introduction}
+The rapid spread of misleading online content has motivated two complementary goals: detecting misinformation and anticipating diffusion potential (``virality'') in time for intervention \citep{Vosoughi2018,Lazer2018,Shu2017}. Although recent literature emphasizes multimodal and graph-based systems, practical deployment still hinges on foundational design choices: (i) how labels are operationalized, (ii) which signals are realistically available, and (iii) whether reported gains survive statistical controls.
+
+This work takes an \emph{evaluation-first} position. We do not introduce a new architecture. Instead, we align and report the current repository pipeline and outputs in a coherent benchmark narrative, emphasizing reproducibility, comparability, and inferential validity.
+
+\section{Tasks and Data}
+\label{sec:tasks-data}
+
+\paragraph{Task T1: Fake-news detection.}
+Binary veracity classification (fake vs. real).
+
+\paragraph{Task T2: Virality prediction.}
+Binary classification of viral vs. non-viral items.
+
+\paragraph{EVONS.}
+EVONS contains article-level text (title/description), source metadata, veracity labels, and aggregate Facebook engagement. For virality, positives are defined by the upper tail of engagement (95th percentile), producing strong class imbalance.
+
+\paragraph{FakeNewsNet (Politifact).}
+The repository uses preprocessed Politifact instances. For virality, labels are induced by a median split on total likes, yielding approximately balanced classes.
+
+\section{Methods}
+\label{sec:methods}
+
+\paragraph{Representations.}
+Texts are embedded upstream and reused during model training. Two embedding backends are compared: RoBERTa-base (768 dimensions) and Mistral embeddings (1024 dimensions).
+
+\paragraph{Model families.}
+Across tasks, we evaluate lightweight downstream classifiers: MLP, logistic regression, random forest, and XGBoost (when available). On EVONS virality, additional source-aware MLP variants are included (source embedding, average engagement feature, and gated fusion).
+
+\paragraph{Evaluation protocol.}
+All reported runs use repeated stratified hold-out with \texttt{StratifiedShuffleSplit} (10 splits, 80/20 train-validation), fixed random seed, and standard metrics (Accuracy, F1, Precision, Recall, ROC-AUC). In imbalanced settings, interpretation prioritizes F1/Recall and ROC-AUC over raw Accuracy.
+
+\paragraph{Statistical controls.}
+Model comparisons are tested pairwise with sign-flip permutation tests and bootstrap confidence intervals (10,000 resamples). Multiple testing is controlled with Holm--Bonferroni; effect sizes are reported with Cliff's $\delta$.
+
+\section{Results}
+\label{sec:results}
+
+Table~\ref{tab:readable-full-results} reports consolidated means across 10 splits for all task/dataset/model settings. Table~\ref{tab:stats-top-pairs} reports top F1 pairwise comparisons (best model vs. strongest alternatives) with inferential controls.
+
+\input{tables_enhanced_main_results.tex}
+\input{tables_statistical_significance.tex}
+
+\paragraph{EVONS -- fake-news detection.}
+Performance is near ceiling. The top mean F1 is achieved by \texttt{mlp\_mistral} (0.988), but corrected pairwise tests indicate no statistically reliable dominance over several strong alternatives.
+
+\paragraph{EVONS -- virality prediction.}
+This is the most difficult and most imbalanced condition. \texttt{gating\_mistral} reaches the highest F1 (0.312) and is the only setting where corrected significant separations are consistently observed against key alternatives (Table~\ref{tab:stats-top-pairs}).
+
+\paragraph{FakeNewsNet -- fake-news detection.}
+The best mean F1 is \texttt{rf\_bert} (0.906). Competing models remain close, and corrected significance is generally not observed among top contenders.
+
+\paragraph{FakeNewsNet -- virality prediction.}
+The best mean F1 is \texttt{xgboost\_bert} (0.777), with several alternatives within a narrow margin. Under correction, differences are not statistically significant.
+
+\section{Discussion}
+\label{sec:discussion}
+
+Three conclusions emerge.
+
+\begin{enumerate}
+  \item \textbf{Task difficulty gap is stable.} Fake-news detection is consistently easier than virality prediction across datasets.
+  \item \textbf{Label design strongly affects apparent performance.} EVONS q95 virality is substantially harder than FakeNewsNet median-split virality.
+  \item \textbf{Statistical controls temper leaderboard interpretations.} In most settings, rank differences among top models are not robust after multiplicity correction; EVONS virality is the main exception.
+\end{enumerate}
+
+Overall, these results support reporting practices where protocol transparency and inferential checks are first-class components of model evaluation.
+
+\section*{Ethics and Limitations}
+Virality labels are operational proxies (q95 on EVONS; median split on FakeNewsNet) and should not be interpreted as universal definitions. Data availability and platform constraints can affect reproducibility and cross-paper comparability. We therefore emphasize transparent preprocessing assumptions, explicit label definitions, and conservative claims grounded in corrected statistical tests.
+
+\section{Bibliographical References}\label{sec:reference}
+\bibliographystyle{lrec2026-natbib}
+\bibliography{lrec2026-example}
+
+\end{document}

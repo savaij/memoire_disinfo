@@ -2,8 +2,8 @@
 """Run the current paper pipeline from local source data to tables and figures.
 
 Stages can also be run separately: preprocess, check, audit, train, paper.
-FakeNewsNet inputs are recovered tweet JSON files supplied by the data owner;
-this repository does not collect or rehydrate tweets.
+FakeNewsNet preprocessing accepts recovered raw tweet files or anonymized
+propagation paths rehydrated through the X API.
 """
 from __future__ import annotations
 
@@ -27,10 +27,7 @@ EVONS = ROOT / "evons" / "data"
 FNN = ROOT / "FakeNewsNet" / "data"
 QUANTILES = ("0.5", "0.75", "0.9", "0.95")
 REQUIRED = {
-    "EVONS": [EVONS / path for path in (
-        "evons.csv", "title_embeddings.pt", "desc_embeddings.pt",
-        "title_embeddings_mistral.pt", "desc_embeddings_mistral.pt",
-    )],
+    "EVONS": [EVONS / "evons.csv"],
     "FakeNewsNet": [FNN / path for path in (
         "ordered_fake_propagation_paths.jsonl",
         "ordered_real_propagation_paths.jsonl",
@@ -48,19 +45,34 @@ def run(command, *, env=None) -> None:
     subprocess.run(args, check=True, cwd=ROOT, env=env)
 
 
-def check() -> bool:
+def check(evons_embedding_dir: Path) -> bool:
     complete = True
-    for paths in REQUIRED.values():
+    paths_by_dataset = {
+        **REQUIRED,
+        "EVONS embeddings": [evons_embedding_dir / path for path in (
+            "title_embeddings.pt", "desc_embeddings.pt",
+            "title_embeddings_mistral.pt", "desc_embeddings_mistral.pt",
+        )],
+    }
+    for paths in paths_by_dataset.values():
         for path in paths:
             exists = path.is_file()
-            print(("OK      " if exists else "MISSING ") + str(path.relative_to(ROOT)))
+            try:
+                displayed_path = path.relative_to(ROOT)
+            except ValueError:
+                displayed_path = path
+            print(("OK      " if exists else "MISSING ") + str(displayed_path))
             complete &= exists
     return complete
 
 
-def preprocess(encoders: str) -> None:
+def preprocess(encoders: str, evons_embeddings: str, evons_embedding_dir: Path,
+               fnn_source: str, fnn_raw_root: Path, fnn_anonymized_dir: Path) -> None:
     run([sys.executable, "preprocessing_and_training/preprocess_datasets.py", "--dataset", "both",
-         "--encoders", encoders])
+         "--encoders", encoders, "--evons-embeddings", evons_embeddings,
+         "--evons-embedding-dir", evons_embedding_dir,
+         "--fnn-source", fnn_source, "--fnn-raw-root", fnn_raw_root,
+         "--fnn-anonymized-dir", fnn_anonymized_dir])
 
 
 def audit() -> None:
@@ -76,13 +88,14 @@ def audit() -> None:
              "--out", AUDITS / f"future_{category}.csv"])
 
 
-def train(fnn_windows: str, baseline_backend: str) -> None:
+def train(fnn_windows: str, baseline_backend: str, evons_embedding_dir: Path) -> None:
     backend = resolve_backend(baseline_backend)
     if backend == "gpu":
         require_gpu()
     METRICS.mkdir(parents=True, exist_ok=True)
     env = dict(os.environ, BASELINE_BACKEND=backend,
-               PAPER_METRICS_DIR=str(METRICS), FNN_WINDOWS=fnn_windows)
+               PAPER_METRICS_DIR=str(METRICS), FNN_WINDOWS=fnn_windows,
+               EVONS_EMBEDDINGS_DIR=str(evons_embedding_dir.resolve()))
     run([sys.executable, "preprocessing_and_training/training/train_evons_veracity.py"], env=env)
     run([sys.executable, "preprocessing_and_training/training/train_fakenewsnet_veracity.py"], env=env)
     run([sys.executable, "preprocessing_and_training/train_virality_quantiles.py",
@@ -109,6 +122,17 @@ def main() -> None:
                         default="check")
     parser.add_argument("--encoders", default="roberta,mistral",
                         help="Encoders to create during preprocessing")
+    parser.add_argument("--evons-embeddings", choices=("generate", "precomputed"),
+                        default="generate",
+                        help="Generate EVONS embeddings from the CSV or reuse precomputed .pt files")
+    parser.add_argument("--evons-embedding-dir", type=Path, default=EVONS,
+                        help="Directory containing or receiving EVONS embedding .pt files")
+    parser.add_argument("--fnn-source", choices=("raw", "anonymized"), default="raw",
+                        help="Use recovered FakeNewsNet tweet files or anonymized IDs plus X API rehydration")
+    parser.add_argument("--fnn-raw-root", type=Path,
+                        default=FNN / "raw_data" / "politifact")
+    parser.add_argument("--fnn-anonymized-dir", type=Path, default=FNN,
+                        help="Directory containing anonymized_fake/real_propagation_paths.jsonl")
     parser.add_argument("--fnn-windows", default=DEFAULT_WINDOWS,
                         help="FakeNewsNet windows among 1,3,5,10,full")
     parser.add_argument("--baseline-backend", choices=("cpu", "gpu"),
@@ -122,9 +146,11 @@ def main() -> None:
         failure_marker.unlink()
     try:
         if args.stage in ("preprocess", "all"):
-            preprocess(args.encoders)
+            preprocess(args.encoders, args.evons_embeddings,
+                       args.evons_embedding_dir.resolve(), args.fnn_source,
+                       args.fnn_raw_root.resolve(), args.fnn_anonymized_dir.resolve())
         if args.stage == "check":
-            if not check():
+            if not check(args.evons_embedding_dir.resolve()):
                 raise FileNotFoundError("Required source data or embeddings are missing.")
             return
         if args.stage in ("audit", "all"):
@@ -135,9 +161,9 @@ def main() -> None:
                 raise FileNotFoundError("Audit inputs are missing: " + ", ".join(map(str, missing)))
             audit()
         if args.stage in ("train", "all"):
-            if not check():
+            if not check(args.evons_embedding_dir.resolve()):
                 raise FileNotFoundError("Required source data or embeddings are missing; run --stage preprocess first.")
-            train(args.fnn_windows, args.baseline_backend)
+            train(args.fnn_windows, args.baseline_backend, args.evons_embedding_dir.resolve())
         if args.stage == "paper":
             required_audits = [AUDITS / "dataset_audit.json",
                                AUDITS / "future_fake.csv", AUDITS / "future_real.csv"]

@@ -15,6 +15,12 @@ DEFAULT_DATA = ROOT / "FakeNewsNet" / "data"
 def parse_created_at(value: str) -> datetime:
     if not isinstance(value, str):
         raise ValueError(f"created_at must be a string, got {type(value).__name__}")
+    # The X API v2 returns ISO 8601 timestamps; the original FakeNewsNet files
+    # use the legacy Twitter timestamp format handled below.
+    try:
+        return datetime.fromisoformat(value.replace("Z", "+00:00"))
+    except ValueError:
+        pass
     try:
         return datetime.strptime(value, "%a %b %d %H:%M:%S %z %Y")
     except ValueError as exc:

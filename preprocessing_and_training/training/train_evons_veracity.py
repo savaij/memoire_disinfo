@@ -21,6 +21,7 @@ from evons_inputs import load_embeddings
 
 DATA_DIR = ROOT / 'evons' / 'data'
 CSV_PATH = DATA_DIR / 'evons.csv'
+EMBEDDINGS_DIR = Path(os.environ.get('EVONS_EMBEDDINGS_DIR', DATA_DIR))
 
 
 # %%
@@ -136,10 +137,10 @@ def main():
 
     required = [
         CSV_PATH,
-        DATA_DIR / 'title_embeddings.pt',
-        DATA_DIR / 'desc_embeddings.pt',
-        DATA_DIR / 'title_embeddings_mistral.pt',
-        DATA_DIR / 'desc_embeddings_mistral.pt',
+        EMBEDDINGS_DIR / 'title_embeddings.pt',
+        EMBEDDINGS_DIR / 'desc_embeddings.pt',
+        EMBEDDINGS_DIR / 'title_embeddings_mistral.pt',
+        EMBEDDINGS_DIR / 'desc_embeddings_mistral.pt',
     ]
     missing = [str(path) for path in required if not path.exists()]
     if missing:
@@ -153,7 +154,7 @@ def main():
     for mode in ['bert', 'mistral']:
         print(f'\n=== Running MLP ({mode}) ===')
         encoder = 'roberta' if mode == 'bert' else mode
-        t, d = load_embeddings(DATA_DIR, encoder, expected_rows=len(y))
+        t, d = load_embeddings(EMBEDDINGS_DIR, encoder, expected_rows=len(y))
         mlp_df = train_eval_mlp(t, d, y)
         mlp_df['model'] = f'mlp_{mode}'
         results.append(mlp_df)

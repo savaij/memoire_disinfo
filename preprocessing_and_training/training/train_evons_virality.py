@@ -21,6 +21,7 @@ from sklearn.model_selection import StratifiedShuffleSplit, train_test_split
 
 DATA_DIR = ROOT / 'evons' / 'data'
 CSV_PATH = DATA_DIR / 'evons.csv'
+EMBEDDINGS_DIR = Path(os.environ.get('EVONS_EMBEDDINGS_DIR', DATA_DIR))
 
 
 # %%
@@ -199,10 +200,10 @@ def run_cv(title_emb, desc_emb, y, source, fb_eng, model_name, n_splits=10, epoc
 def main():
     required = [
         CSV_PATH,
-        DATA_DIR / 'title_embeddings.pt',
-        DATA_DIR / 'desc_embeddings.pt',
-        DATA_DIR / 'title_embeddings_mistral.pt',
-        DATA_DIR / 'desc_embeddings_mistral.pt',
+        EMBEDDINGS_DIR / 'title_embeddings.pt',
+        EMBEDDINGS_DIR / 'desc_embeddings.pt',
+        EMBEDDINGS_DIR / 'title_embeddings_mistral.pt',
+        EMBEDDINGS_DIR / 'desc_embeddings_mistral.pt',
     ]
     missing = [str(path) for path in required if not path.exists()]
     if missing:
@@ -212,8 +213,8 @@ def main():
     df, y, source, fb_eng = load_virality_data(CSV_PATH)
     print('Rows:', len(df), '| Positive rate:', y.mean().round(4))
 
-    bert_t, bert_d = load_embeddings(DATA_DIR, 'roberta', expected_rows=len(y))
-    mis_t, mis_d = load_embeddings(DATA_DIR, 'mistral', expected_rows=len(y))
+    bert_t, bert_d = load_embeddings(EMBEDDINGS_DIR, 'roberta', expected_rows=len(y))
+    mis_t, mis_d = load_embeddings(EMBEDDINGS_DIR, 'mistral', expected_rows=len(y))
 
     results = [
         run_cv(bert_t, bert_d, y, source, fb_eng, model_name='mlp_text'),

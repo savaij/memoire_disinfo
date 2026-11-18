@@ -1,0 +1,35 @@
+\begin{table}[!ht]
+\centering
+\caption{{\bf FakeNewsNet total-engagement classification by text window.} Results use the same 434-story cohort at every window. The best model within each quantile and window is selected by mean calibrated F1; AP and ROC-AUC refer to that model. The target is \emph{total} recovered tweet favorites in every row.}
+\label{tab:fnn-virality}
+\small
+\begin{tabular}{cclrrr}
+\toprule
+$q$ & Window & Best model & F1\textsubscript{sel} & AP & ROC-AUC \\
+\midrule
+.50 & $k=1$ & mlp\_mistral & 0.674 & 0.715 & 0.690 \\
+.50 & $k=3$ & logreg\_mistral & 0.682 & 0.715 & 0.704 \\
+.50 & $k=5$ & logreg\_mistral & 0.678 & 0.708 & 0.703 \\
+.50 & $k=10$ & mlp\_bert & 0.676 & 0.724 & 0.700 \\
+.50 & full & logreg\_mistral & 0.735 & 0.804 & 0.802 \\
+\midrule
+.75 & $k=1$ & logreg\_mistral & 0.557 & 0.618 & 0.787 \\
+.75 & $k=3$ & logreg\_mistral & 0.617 & 0.658 & 0.808 \\
+.75 & $k=5$ & mlp\_bert & 0.615 & 0.641 & 0.805 \\
+.75 & $k=10$ & mlp\_bert & 0.599 & 0.634 & 0.812 \\
+.75 & full & rf\_mistral & 0.764 & 0.819 & 0.892 \\
+\midrule
+.90 & $k=1$ & logreg\_mistral & 0.464 & 0.516 & 0.808 \\
+.90 & $k=3$ & logreg\_mistral & 0.609 & 0.543 & 0.839 \\
+.90 & $k=5$ & logreg\_mistral & 0.613 & 0.561 & 0.836 \\
+.90 & $k=10$ & mlp\_bert & 0.554 & 0.609 & 0.876 \\
+.90 & full & rf\_bert & 0.615 & 0.666 & 0.907 \\
+\midrule
+.95 & $k=1$ & mlp\_bert & 0.261 & 0.368 & 0.806 \\
+.95 & $k=3$ & mlp\_bert & 0.428 & 0.395 & 0.817 \\
+.95 & $k=5$ & mlp\_bert & 0.390 & 0.381 & 0.854 \\
+.95 & $k=10$ & logreg\_mistral & 0.382 & 0.433 & 0.883 \\
+.95 & full & rf\_mistral & 0.574 & 0.664 & 0.963 \\
+\bottomrule
+\end{tabular}
+\end{table}

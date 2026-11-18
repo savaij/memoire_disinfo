@@ -3,10 +3,7 @@ transformers
 scikit-learn
 pandas
 numpy
-tqdm
+scipy
 matplotlib
-seaborn
-wandb
+tqdm
 mistralai
-jupyter
-notebook

@@ -1,0 +1,17 @@
+\begin{table}[!ht]
+\centering
+\caption{{\bf Constructs and operational measures.} The interpretation of a benchmark score depends on the unit assigned a label, the observed outcome and the information available at prediction time.}
+\label{tab:construct-map}
+\footnotesize
+\begin{tabular}{@{}>{\raggedright\arraybackslash}p{1.00in}>{\raggedright\arraybackslash}p{1.66in}>{\raggedright\arraybackslash}p{2.23in}@{}}
+\toprule
+Substantive claim & Recorded operationalization & Inference warranted here \\
+\midrule
+Detect false news & EVONS and FakeNewsNet--PolitiFact real/fake labels & Classification on veracity of an article based on known categories \\
+\addlinespace
+Predict diffusion & Facebook likes + comments + shares (EVONS); summed tweet favorites (FakeNewsNet), dichotomized at quantiles & Prediction of platform-specific engagement tails \\
+\addlinespace
+Predict early spread & Tweets texts' versus final total favorites. And early favorites versus later favorite snapshots & Subsequent spread based on recovered cascades \\
+\bottomrule
+\end{tabular}
+\end{table}

@@ -1,6 +1,14 @@
 .DS_Store
 CLAUDE.md
+__pycache__/
+*.py[cod]
+FakeNewsNet/data/raw_data/
 FakeNewsNet/data/*.jsonl
-FakeNewsNet/data/fake_news_net/*
+FakeNewsNet/data/fake_news_net/*.pt
+FakeNewsNet/data/fake_news_net/*_manifest.json
 evons/data/evons.csv
 evons/data/*.pt
+evons/data/*_manifest.json
+results/RUN_FAILED.txt
+/PLOS_ONE_final_polished_2026-10-26/
+/PLOS_ONE_Response_to_Reviewers_Final.docx

@@ -1,0 +1,16 @@
+\begin{table}[!ht]
+\centering
+\caption{{\bf EVONS q95 comparisons with the Mistral-gated model.} Mean calibrated-F1 differences are evaluated on matched repeated holdouts with approximate corrected-resampled inference and Holm adjustment. Cliff's $\delta$ describes differences between score distributions across ten repetitions.}
+\label{tab:cliffs}
+\small
+\begin{tabular}{lrrr}
+\toprule
+Alternative (B) & Mean F1 difference & Cliff's $\delta$ & Holm $p$ \\
+\midrule
+Gated RoBERTa & 0.0297 & 0.90 & 0.0137 \\
+Source-average MLP & 0.0288 & 0.98 & 0.0085 \\
+Source-embedding MLP & 0.0294 & 0.96 & 0.0091 \\
+Text-only MLP & 0.0828 & 1.00 & $<0.001$ \\
+\bottomrule
+\end{tabular}
+\end{table}

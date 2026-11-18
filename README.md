@@ -1,170 +1,57 @@
-# M2 Mémoire – Disinformation Detection & Virality Prediction
+# What Do Misinformation Benchmarks Measure?
 
-This repository contains the codebase for the master thesis (M2 « Humanités Numériques », École nationale des chartes) studying automatic classification of (a) fake vs. real news and (b) viral vs. non‑viral items / propagations across two different news datasets. 
+This repository contains the code and saved results for the paper “What Do Misinformation Benchmarks Measure? Construct Validity in Veracity and Engagement Prediction.”
 
-[**Click here to read the thesis!**](https://savaij.github.io/memoire_disinfo/report/memoire.pdf)
+The study uses EVONS and the PolitiFact part of FakeNewsNet as datasets. It examines whether models can predict the fake or real labels recorded in each dataset, and whether they can identify items with many social media interactions, such as likes, comments, shares, or tweet favorites. For FakeNewsNet, it also compares predictions based on the first few tweets with predictions based on all recovered tweets. A separate analysis checks whether favorites on early tweets are related to favorites on later tweets.
 
-## 1. Tasks
+**The repository includes both the code and the saved training results used to create the paper’s tables.** It also includes the audit summaries, statistical comparisons, tables, and figures produced from those results. The original data and trained model files are not included.
 
-| Task | Definition | Label Source |
-|------|------------|--------------|
-| Disinformation Detection | Binary classification: fake vs real news item / propagation | Dataset ground‑truth labels (Evons & FakeNewsNet-Politifact) |
-| Virality Prediction | Binary classification: will an item / propagation be “viral” | Evons: ≥ 95th percentile Facebook engagement. FakeNewsNet: ≥ median total likes across propagations |
+## Repository contents
 
-## 2. Datasets
+- `preprocessing_and_training/` prepares the data, creates text representations, and trains the models.
+- `metrics_and_audits/` checks the data and calculates model scores and comparisons.
+- `paper/` contains the scripts that create the paper’s tables and figures.
+- `run_pipeline/run.py` runs the steps above.
+- `results/` contains the saved training scores, audit summaries, comparisons, tables, and figures.
 
-### Evons Dataset
-Static news articles with metadata and engagement statistics (e.g. Facebook). Modeling treats each article independently (non‑sequential). Text = title + caption/description. Virality label derived from high‑end engagement threshold (95th percentile). See `evons/data/readme.md` for download & embedding links.
+## Rebuild the paper tables and figures
 
-### FakeNewsNet (Politifact subset)
-Twitter propagation trees. Each propagation becomes a sequence of per‑tweet features: text embedding + scalar metadata (verification flag, follower/following counts, favorites, elapsed time, etc.). Virality defined via median total likes threshold. Raw data access subject to Twitter/X restrictions — see `FakeNewsNet/data/readme.md`.
-
-## 3. Repository Overview
-
-```
-memoire_disinfo/
-├── evons/
-│   ├── data/                        # Evons raw data & precomputed embeddings (external download)
-│   ├── disinformation_detection/    # MLP variants (RoBERTa & Mistral)
-│   └── virality_prediction/         # MLP baseline + source / engagement feature variants
-│
-├── FakeNewsNet/
-│   ├── data/                        # Politifact sequences & embeddings (external download)
-│   ├── data_preprocessing/          # Scripts: ordering, path creation, embedding generation
-│   ├── disinformation_detection/    # Sequence model notebooks (CNN/RNN/GRU/LSTM/Transformer)
-│   └── virality_prediction/         # Same architectures for virality label
-│
-└── report/                          # LaTeX sources and compiled PDF of the report
-```
-
-Both dataset folders intentionally mirror a two‑task layout for clarity and comparability.
-
-
-## 4. Data Access & Privacy
-
-Data are **not** committed because of size & licensing:
-* Evons: follow upstream instructions; precomputed embeddings via provided Drive folder.
-* FakeNewsNet Politifact: raw data requires permission / contact; processed sequences & embeddings via protected Drive link. Respect Twitter/X terms for any redistribution.
-
-See each dataset’s `data/readme.md` for authoritative links and any required credentials or requests.
-
-
-## 5. How To Reproduce
-
-1. Obtain and place data as described in `evons/data/readme.md` and `FakeNewsNet/data/readme.md`.
-2. (Optional) For FakeNewsNet: regenerate data using scripts in `FakeNewsNet/data_preprocessing/` (`path_creation.py`, `ordering_data.py`, `create_embeddings.py`, `create_embeddings_mistral.py`). <br> Evons notebooks already provide code for embedding texts on the fly if they are not available in the `evons/data` folder. If you download preprocessed data, you can skip this step.
-3. Open the relevant notebook (e.g., `evons/disinformation_detection/MLP.ipynb`) and execute cells top‑to‑bottom. Notebooks are self‑contained (data paths assume relative placement inside each dataset’s `data/`).
-4. Compare output metrics across variants.
-
-### Suggested Python Environment 
-The following packages are required:
-`torch`, `transformers`, `scikit-learn`, `pandas`, `numpy`, `tqdm`, `matplotlib`, `seaborn`, `wandb`, `jupyter`, `notebook`.
-
-`mistralai` is required for Mistral embedding generation.
-
-You can install everything with:
-```bash
-pip install -r requirements.txt
-```
-
-## 6. Folder Quick Reference
-
-| Path | Purpose |
-|------|---------|
-| `evons/disinformation_detection/` | Article fake vs real (MLP variants) |
-| `evons/virality_prediction/` | Article virality (MLP + feature fusion variants) |
-| `FakeNewsNet/data_preprocessing/` | Build tweet sequences & embeddings |
-| `FakeNewsNet/disinformation_detection/` | Propagation fake vs real (sequence models) |
-| `FakeNewsNet/virality_prediction/` | Propagation virality (sequence models) |
-
-
----
-**Important**: the code does not save model weights after training. To save them, modify the notebooks, specifically the 
-_`train_single_fold`_ functions.
-
----
-For questions or access issues (e.g., processed data links), contact the author.
-
-
-## 7. Statistical significance add-on (for rebuttal / paper revision)
-
-To support model-comparison claims with inferential statistics (instead of only mean/std across folds), use:
+The saved results are enough to recreate the tables and generated figures. You do not need the original datasets or a Mistral API key for this step.
 
 ```bash
-python tools/statistical_evaluation.py --input <metrics.csv> --output <stats.csv>
+python -m pip install -r requirements.txt
+python run_pipeline/run.py --stage paper
 ```
 
-The script expects per-fold metrics and outputs, for each pair of models (within each dataset/task/metric):
-- paired mean difference
-- bootstrap 95% CI of the mean difference
-- exact sign-flip p-value (paired test; Monte-Carlo approximation for many folds)
-- Holm-Bonferroni corrected p-values
-- Cliff's delta effect size
+The new files are written to `results/inference/` and `results/paper/`.
 
-Supported input formats:
-- **long**: `dataset,task,metric,fold,model,value`
-- **wide** (one column per model) with `--wide --id-cols dataset task metric fold`
+## Run the full analysis
 
-This is compatible with already-computed embeddings and preprocessed data; no embedding recomputation is required.
+The source datasets are not included. Obtain them separately and follow their access and use rules. Place the files here:
 
+- EVONS CSV: `evons/data/evons.csv`
+- Already recovered FakeNewsNet PolitiFact tweet files: `FakeNewsNet/data/raw_data/politifact/{fake,real}/<story>/tweets/`
 
-## 8. EVONS source-confounding audit (no embedding recomputation)
+The pipeline does not download or recover FakeNewsNet tweets. It starts from the tweet files you provide. It turns text into numeric inputs for the models using RoBERTa and Mistral. Mistral requires the `MISTRAL_API_KEY` environment variable. The Mistral model provided by the service can change over time.
 
-To directly test source leakage risk (review concern), run:
+To run all steps, including data preparation, training, and table and figure generation:
 
 ```bash
-python tools/evons_source_confounding_audit.py \
-  --input evons/data/evons.csv \
-  --metrics-out report/evons_source_audit_folds.csv \
-  --report-out report/evons_source_audit_report.json \
-  --export-group-folds report/evons_group_folds.csv
+python -m pip install -r requirements.txt
+python -m pip install -r requirements-gpu.txt
+python run_pipeline/run.py --stage all --baseline-backend gpu
 ```
 
-This script computes:
-- source-label association diagnostics (Chi² and Cramér's V)
-- a **source-only baseline** under random K-fold vs group K-fold by source
-- per-fold metrics (`accuracy`, `macro_f1`, `unseen_source_ratio`)
-- optional row-to-fold assignment for source-grouped CV reuse in notebooks
+The GPU option requires a compatible NVIDIA GPU and CUDA setup. To use the CPU versions of the logistic regression and random forest models instead, replace `gpu` with `cpu`; results may differ from the saved results.
 
-Interpretation: if source-only performance is strong on random CV but drops on source-grouped CV, the task is likely source-confounded.
+The full run covers engagement cutoffs at 50%, 75%, 90%, and 95%. For FakeNewsNet it compares text from the first 1, 3, 5, or 10 tweets with the full recovered sequence. These comparisons use stories with at least 11 recovered tweets. Training can take several hours. A new run may not exactly match the saved scores because some training steps use random initialization and the Mistral service can change.
 
+## Results
 
-## 9. FakeNewsNet virality sensitivity audit (no embedding recomputation)
+- `results/metrics/` contains the saved model scores from each evaluation run. These files are used to build the paper tables.
+- `results/audits/` contains summaries of data checks and the early-to-later tweet engagement analysis.
+- `results/inference/` contains the model comparisons used in the paper.
+- `results/paper/tables/` contains the generated LaTeX tables and supporting CSV files.
+- `results/paper/figures/` contains the generated figures in PDF and PNG formats.
 
-To justify the virality definition and evaluate an early-detection framing with existing preprocessed propagations:
-
-```bash
-python tools/fakenewsnet_virality_sensitivity.py \
-  --input-jsonl FakeNewsNet/data/ordered_real_propagation_paths.jsonl \
-  --thresholds-out report/fnn_virality_thresholds_real.csv \
-  --early-out report/fnn_virality_early_real.csv \
-  --summary-out report/fnn_virality_summary_real.json
-```
-
-Run it on both real and fake propagation files, then merge rows for a global view if needed.
-
-What it reports:
-- threshold sensitivity for q50/q75/q90/q95 (or custom quantiles): threshold value and class balance
-- early-signal diagnostics using first `k` tweets (configurable):
-  - correlation between prefix likes and final total likes
-  - AUC of prefix-likes as a simple score for each threshold-defined label
-  - average prefix/total engagement ratio
-
-This enables reframing q50 as high/low engagement and testing stricter virality (q90/q95) without retraining embeddings.
-
-
-## 10. Colab quick-start (without embedding recomputation)
-
-If you already have precomputed embeddings and only want to rerun training/evaluation in Colab, use:
-
-- `colab_no_embeddings/evons_colab_runbook.md`
-- `colab_no_embeddings/fakenewsnet_colab_runbook.md`
-
-These runbooks now point to a **single consolidated notebook per task** (4 notebooks total: Evons/FakeNewsNet × disinformation/virality), and explicitly skip embedding regeneration scripts.
-
-
-## Backend GPU opzionale per le baseline
-
-RF e regressione logistica supportano `--baseline-backend cpu|gpu` nel runner di revisione.
-Per ambiente conda, kernel notebook, benchmark separato e compatibilità dei CSV, vedere
-[la guida del backend](tools/README_baseline_backend.md).
+Keep source data, generated embeddings, raw text, API keys, and local training logs out of version control.

@@ -1,0 +1,190 @@
+{
+  "method": "Nadeau-Bengio approximate corrected resampled t",
+  "description": "Paired scores from 10 overlapping stratified holdouts; additional calibration split not explicitly modeled",
+  "fit_fraction": 0.6,
+  "test_fraction": 0.2,
+  "holm_scope_model": "all pairwise models within dataset/task/quantile/window",
+  "holm_scope_windows": "all 4 prefix vs full contrasts times all models within dataset/task/quantile",
+  "files": [
+    {
+      "dataset": "evons",
+      "task": "veracity",
+      "quantile": "NA",
+      "input": "results/metrics/evons_disinformation_merged_cv_results.csv",
+      "cohort_fingerprint": null,
+      "windows": [
+        "article"
+      ],
+      "models_per_window": {
+        "article": 6
+      },
+      "n_per_model": 10
+    },
+    {
+      "dataset": "fakenewsnet",
+      "task": "veracity",
+      "quantile": "NA",
+      "input": "results/metrics/fakenewsnet_disinformation_prefix/fakenewsnet_disinformation_merged_cv_results.csv",
+      "cohort_fingerprint": "ce04e5e2078c3e221b1897e2bfb2cbca6fc20156e68f78faeae1111f3342e7ac",
+      "windows": [
+        "full",
+        "k1",
+        "k10",
+        "k3",
+        "k5"
+      ],
+      "models_per_window": {
+        "k1": 6,
+        "k3": 6,
+        "k5": 6,
+        "k10": 6,
+        "full": 6
+      },
+      "n_per_model": 10
+    },
+    {
+      "dataset": "evons",
+      "task": "virality",
+      "quantile": "50",
+      "input": "results/metrics/evons_virality_q50/evons_virality_merged_cv_results.csv",
+      "cohort_fingerprint": null,
+      "windows": [
+        "article"
+      ],
+      "models_per_window": {
+        "article": 5
+      },
+      "n_per_model": 10
+    },
+    {
+      "dataset": "fakenewsnet",
+      "task": "virality",
+      "quantile": "50",
+      "input": "results/metrics/fakenewsnet_virality_prefix_q50/fakenewsnet_virality_merged_cv_results.csv",
+      "cohort_fingerprint": "ce04e5e2078c3e221b1897e2bfb2cbca6fc20156e68f78faeae1111f3342e7ac",
+      "windows": [
+        "full",
+        "k1",
+        "k10",
+        "k3",
+        "k5"
+      ],
+      "models_per_window": {
+        "k1": 6,
+        "k3": 6,
+        "k5": 6,
+        "k10": 6,
+        "full": 6
+      },
+      "n_per_model": 10
+    },
+    {
+      "dataset": "evons",
+      "task": "virality",
+      "quantile": "75",
+      "input": "results/metrics/evons_virality_q75/evons_virality_merged_cv_results.csv",
+      "cohort_fingerprint": null,
+      "windows": [
+        "article"
+      ],
+      "models_per_window": {
+        "article": 5
+      },
+      "n_per_model": 10
+    },
+    {
+      "dataset": "fakenewsnet",
+      "task": "virality",
+      "quantile": "75",
+      "input": "results/metrics/fakenewsnet_virality_prefix_q75/fakenewsnet_virality_merged_cv_results.csv",
+      "cohort_fingerprint": "ce04e5e2078c3e221b1897e2bfb2cbca6fc20156e68f78faeae1111f3342e7ac",
+      "windows": [
+        "full",
+        "k1",
+        "k10",
+        "k3",
+        "k5"
+      ],
+      "models_per_window": {
+        "k1": 6,
+        "k3": 6,
+        "k5": 6,
+        "k10": 6,
+        "full": 6
+      },
+      "n_per_model": 10
+    },
+    {
+      "dataset": "evons",
+      "task": "virality",
+      "quantile": "90",
+      "input": "results/metrics/evons_virality_q90/evons_virality_merged_cv_results.csv",
+      "cohort_fingerprint": null,
+      "windows": [
+        "article"
+      ],
+      "models_per_window": {
+        "article": 5
+      },
+      "n_per_model": 10
+    },
+    {
+      "dataset": "fakenewsnet",
+      "task": "virality",
+      "quantile": "90",
+      "input": "results/metrics/fakenewsnet_virality_prefix_q90/fakenewsnet_virality_merged_cv_results.csv",
+      "cohort_fingerprint": "ce04e5e2078c3e221b1897e2bfb2cbca6fc20156e68f78faeae1111f3342e7ac",
+      "windows": [
+        "full",
+        "k1",
+        "k10",
+        "k3",
+        "k5"
+      ],
+      "models_per_window": {
+        "k1": 6,
+        "k3": 6,
+        "k5": 6,
+        "k10": 6,
+        "full": 6
+      },
+      "n_per_model": 10
+    },
+    {
+      "dataset": "evons",
+      "task": "virality",
+      "quantile": "95",
+      "input": "results/metrics/evons_virality_q95/evons_virality_merged_cv_results.csv",
+      "cohort_fingerprint": null,
+      "windows": [
+        "article"
+      ],
+      "models_per_window": {
+        "article": 5
+      },
+      "n_per_model": 10
+    },
+    {
+      "dataset": "fakenewsnet",
+      "task": "virality",
+      "quantile": "95",
+      "input": "results/metrics/fakenewsnet_virality_prefix_q95/fakenewsnet_virality_merged_cv_results.csv",
+      "cohort_fingerprint": "ce04e5e2078c3e221b1897e2bfb2cbca6fc20156e68f78faeae1111f3342e7ac",
+      "windows": [
+        "full",
+        "k1",
+        "k10",
+        "k3",
+        "k5"
+      ],
+      "models_per_window": {
+        "k1": 6,
+        "k3": 6,
+        "k5": 6,
+        "k10": 6,
+        "full": 6
+      },
+      "n_per_model": 10
+    }
+  ]
+}

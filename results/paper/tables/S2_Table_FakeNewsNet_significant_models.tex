@@ -1,0 +1,35 @@
+\documentclass[10pt,letterpaper]{article}
+\usepackage[landscape,margin=0.65in]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage{booktabs,longtable,amsmath,textcomp}
+\usepackage[hidelinks]{hyperref}
+\setlength{\parindent}{0pt}
+\setlength{\tabcolsep}{5pt}
+\renewcommand{\arraystretch}{1.15}
+\begin{document}
+{\large\bfseries S2 Table. Comparing FakeNewsNet models using the same number of tweets.}\par\medskip
+Each row compares two models given the same first $k$ recovered tweets. Five of the 375 comparisons remain significant after the Holm correction. All five predict engagement above the 90th percentile: one uses the first three tweets and four use the first five. $\Delta$F1 is the mean F1 score of model A minus that of model B. All values are positive, so model A performs better in every row. Cliff\textquotesingle s $\delta$ follows the same direction. The $p$-values are adjusted across all 15 model pairs tested with the same task, cutoff and number of tweets.\par\smallskip
+Scores come from ten runs, using the same data splits for both models or text windows in each comparison. In each run, the classification threshold was chosen on a separate calibration set. Only differences with a Holm-adjusted $p<0.05$ are shown. The adjustment includes all comparisons in each group, including those not shown here. The 95\% confidence intervals account approximately for overlap between the data splits; they are not adjusted for multiple comparisons. Cliff's $\delta$ describes how the scores differ across runs; it is not a separate significance test. In the model names, \texttt{bert} means RoBERTa embeddings and \texttt{mistral} means Mistral embeddings.\par\medskip
+\small
+\begin{longtable}{llllrlrr}
+\toprule
+Task/$q$ & Window & Model A & Model B & $\Delta$F1 & 95\% CI & Cliff\textquotesingle s $\delta$ & Holm $p$ \\
+\midrule
+\endfirsthead
+\multicolumn{8}{l}{\textbf{S2 Table (continued).}} \\
+\toprule
+Task/$q$ & Window & Model A & Model B & $\Delta$F1 & 95\% CI & Cliff\textquotesingle s $\delta$ & Holm $p$ \\
+\midrule
+\endhead
+\midrule
+\multicolumn{8}{r}{Continued on next page} \\
+\endfoot
+\bottomrule
+\endlastfoot
+Eng. .90 & $k=3$ & \texttt{logreg\_mistral} & \texttt{rf\_mistral} & 0.4091 & [0.2157, 0.6025] & 1.00 & 0.0149 \\
+Eng. .90 & $k=5$ & \texttt{logreg\_bert} & \texttt{rf\_mistral} & 0.3526 & [0.1751, 0.5301] & 0.98 & 0.0195 \\
+Eng. .90 & $k=5$ & \texttt{logreg\_mistral} & \texttt{mlp\_mistral} & 0.2158 & [0.1222, 0.3095] & 0.70 & 0.0083 \\
+Eng. .90 & $k=5$ & \texttt{logreg\_mistral} & \texttt{rf\_mistral} & 0.3874 & [0.1718, 0.6031] & 0.98 & 0.0339 \\
+Eng. .90 & $k=5$ & \texttt{mlp\_bert} & \texttt{rf\_mistral} & 0.3571 & [0.1833, 0.5308] & 0.99 & 0.0168 \\
+\end{longtable}
+\end{document}

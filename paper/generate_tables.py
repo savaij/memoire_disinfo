@@ -18,7 +18,7 @@ from paired_resampling_inference import WINDOWS, inputs
 
 
 QUANTILES = ('50', '75', '90', '95')
-METRICS = ('f1', 'f1_tuned', 'pr_auc', 'auc', 'pr_baseline')
+METRICS = ('f1', 'f1_tuned', 'pr_auc', 'auc', 'pr_baseline', 'majority_accuracy')
 F1_LABEL = r'F1\textsubscript{sel}'
 CLASSIFIERS = {f'{model}_{encoder}' for model in ('mlp', 'logreg', 'rf')
                for encoder in ('bert', 'mistral')}
@@ -213,20 +213,25 @@ def result_tables(summaries, audit, matched_thresholds, pairs):
                                    'lrrrc', ['Veracity label', '$q$', 'Threshold', 'Positive count', 'Subset size'],
                                    [threshold_block(category.title(), fnn_thresholds[f'{category}_sensitivity_subset'])
                                     for category in ('real', 'fake')])
-    evons_veracity = [['EVONS', model_name(row['model']), *metric_cells(row, *METRICS[:4])]
+    evons_veracity = [['EVONS', model_name(row['model']), *metric_cells(row, *METRICS[:4]),
+                       *metric_cells(row, 'pr_baseline', 'majority_accuracy')]
                       for row in summaries['evons', 'veracity', 'NA', 'article']]
     fnn_veracity = []
     for window in WINDOWS:
         row = summaries['fakenewsnet', 'veracity', 'NA', window][0]
         fnn_veracity.append([f'FNN, {window_name(window)}', model_name(row['model']),
-                             *metric_cells(row, *METRICS[:4])])
+                             *metric_cells(row, *METRICS[:4]),
+                             *metric_cells(row, 'pr_baseline', 'majority_accuracy')])
     veracity = main_table('veracity-results', "Predicting the datasets' fake/real labels.",
                           'EVONS labels are assigned by media-source category; FakeNewsNet labels derive from PolitiFact. '
                           'Results are means over ten repeated stratified holdouts; in FakeNewsNet, the highest-F1 model '
                           'is listed for each textual window of the 434-story cohort. '
-                          f'{F1_LABEL} uses a threshold chosen on a separate calibration split.', 'llrrrr',
-                          ['Dataset/window', 'Model', 'F1 (0.5)', F1_LABEL, 'AP', 'ROC-AUC'],
-                          [evons_veracity, fnn_veracity])
+                          f'{F1_LABEL} uses a threshold chosen on a separate calibration split. '
+                          'AP baseline is positive-class prevalence; majority accuracy is the larger class share, '
+                          'averaged over test splits.', 'llrrrrrr',
+                          ['Dataset/window', 'Model', 'F1 (0.5)', F1_LABEL, 'AP', 'ROC-AUC',
+                           'AP baseline', 'Majority acc.'],
+                          [evons_veracity, fnn_veracity], font_size='footnotesize')
     evons_virality = []
     fnn_virality = []
     for q in QUANTILES:
@@ -236,7 +241,8 @@ def result_tables(summaries, audit, matched_thresholds, pairs):
         for window in WINDOWS:
             row = summaries['fakenewsnet', 'virality', q, window][0]
             block.append([quantile_name(q), window_name(window), model_name(row['model']),
-                          *metric_cells(row, 'f1_tuned', 'pr_auc', 'auc')])
+                          *metric_cells(row, 'f1_tuned', 'pr_auc', 'auc',
+                                        'pr_baseline', 'majority_accuracy')])
         fnn_virality.append(block)
     return {
         'construct_map': construct_map(),
@@ -245,15 +251,20 @@ def result_tables(summaries, audit, matched_thresholds, pairs):
         'veracity_results': veracity,
         'evons_virality': main_table('evons-virality', 'EVONS engagement-tail prediction.',
                                      f'The table reports the highest mean calibration-selected F1 model for each engagement quantile. '
-                                     'AP is average precision; its random-ranking baseline approximately equals the positive class prevalence.',
-                                     'clrrrrr', ['$q$', 'Model', 'F1 (0.5)', F1_LABEL, 'AP', 'ROC-AUC', 'AP baseline'],
-                                     [evons_virality]),
+                                     'AP is average precision; its random-ranking baseline is positive-class prevalence. '
+                                     'Majority accuracy is the larger class share, averaged over test splits.',
+                                     'clrrrrrr', ['$q$', 'Model', 'F1 (0.5)', F1_LABEL, 'AP', 'ROC-AUC',
+                                                  'AP baseline', 'Majority acc.'],
+                                     [evons_virality], font_size='footnotesize'),
         'fnn_virality': main_table('fnn-virality', 'FakeNewsNet total-engagement classification by text window.',
                                    'Results use the same 434-story cohort at every window. '
                                    f'The best model within each quantile and window is selected by mean calibrated F1; '
-                                   'AP and ROC-AUC refer to that model. The target is \\emph{total} recovered tweet favorites in every row.',
-                                   'cclrrr', ['$q$', 'Window', 'Best model', F1_LABEL, 'AP', 'ROC-AUC'],
-                                   fnn_virality),
+                                   'AP and ROC-AUC refer to that model. AP baseline is positive-class prevalence; '
+                                   'majority accuracy is the larger class share, averaged over test splits. '
+                                   'The target is \\emph{total} recovered tweet favorites in every row.',
+                                   'cclrrrrr', ['$q$', 'Window', 'Best model', F1_LABEL, 'AP', 'ROC-AUC',
+                                                'AP baseline', 'Majority acc.'],
+                                   fnn_virality, font_size='footnotesize'),
         'cliffs': evons_q95_comparisons(pairs),
     }
 
